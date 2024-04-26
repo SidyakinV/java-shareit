@@ -1,5 +1,6 @@
 package ru.practicum.shareit.errorhandler;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -17,31 +18,27 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
+@Slf4j
 public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ValidationErrorResponse onConstraintValidationException(
-            ConstraintViolationException e
-    ) {
+    public ValidationErrorResponse onConstraintValidationException(ConstraintViolationException e) {
         final List<Violation> violations = e.getConstraintViolations().stream()
-                .map(
-                        violation -> new Violation(
-                                violation.getPropertyPath().toString(),
-                                violation.getMessage()
-                        )
-                )
+                .map(violation -> new Violation(
+                        violation.getPropertyPath().toString(),
+                        violation.getMessage()))
+                .peek(violation -> log.info("Exception (onConstraintValidationException): " + violation.getMessage()))
                 .collect(Collectors.toList());
         return new ValidationErrorResponse(violations);
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ValidationErrorResponse onMethodArgumentNotValidException(
-            MethodArgumentNotValidException e
-    ) {
+    public ValidationErrorResponse onMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         final List<Violation> violations = e.getBindingResult().getFieldErrors().stream()
                 .map(error -> new Violation(error.getField(), error.getDefaultMessage()))
+                .peek(violation -> log.info("Exception (onMethodArgumentNotValidException): " + violation.getMessage()))
                 .collect(Collectors.toList());
         return new ValidationErrorResponse(violations);
     }
@@ -51,6 +48,7 @@ public class ErrorHandler {
     public ValidationErrorResponse onManualValidationException(final ValidationException e) {
         List<Violation> violations = new ArrayList<>();
         violations.add(e.getViolation());
+        log.info("Exception (onManualValidationException): " + e.getMessage());
         return new ValidationErrorResponse(violations);
     }
 
@@ -59,6 +57,7 @@ public class ErrorHandler {
     public ValidationErrorResponse onNotFoundException(final NotFoundException e) {
         List<Violation> violations = new ArrayList<>();
         violations.add(e.getViolation());
+        log.info("Exception (onNotFoundException): " + e.getMessage());
         return new ValidationErrorResponse(violations);
     }
 
@@ -67,6 +66,7 @@ public class ErrorHandler {
     public ValidationErrorResponse onConflictException(final ConflictException e) {
         List<Violation> violations = new ArrayList<>();
         violations.add(e.getViolation());
+        log.info("Exception (onConflictException): " + e.getMessage());
         return new ValidationErrorResponse(violations);
     }
 
