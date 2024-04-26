@@ -77,7 +77,7 @@ public class UserServiceImpl implements UserService {
     private void checkEmailExists(String email, Long userId) {
         List<User> users = userRepository.findUserByEmail(email);
         for (User user : users) {
-            if (user.getId() != userId) {
+            if (user.getId().equals(userId)) {
                 throw new ConflictException(
                         new Violation("email", "Пользователь с указанным email уже существует!"));
             }

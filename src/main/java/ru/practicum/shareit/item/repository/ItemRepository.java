@@ -6,10 +6,10 @@ import java.util.List;
 
 public interface ItemRepository {
 
-    public Item addItem(Item item);
-    public Item updateItem(Item item);
-    public Item getItem(long itemId);
-    public List<Item> getOwnerItems(long userId);
-    public List<Item> searchItems(String text);
+    Item addItem(Item item);
+    Item updateItem(Item item);
+    Item getItem(long itemId);
+    List<Item> getOwnerItems(long userId);
+    List<Item> searchItems(String text);
 
 }
