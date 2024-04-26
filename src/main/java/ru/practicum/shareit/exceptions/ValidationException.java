@@ -6,6 +6,6 @@ import ru.practicum.shareit.errorhandler.model.Violation;
 
 @RequiredArgsConstructor
 @Getter
-public class ValidationException extends RuntimeException{
+public class ValidationException extends RuntimeException {
     private final Violation violation;
 }

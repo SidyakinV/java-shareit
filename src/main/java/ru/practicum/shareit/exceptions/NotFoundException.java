@@ -6,6 +6,6 @@ import ru.practicum.shareit.errorhandler.model.Violation;
 
 @RequiredArgsConstructor
 @Getter
-public class NotFoundException extends RuntimeException{
+public class NotFoundException extends RuntimeException {
     private final Violation violation;
 }
