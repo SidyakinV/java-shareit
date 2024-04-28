@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.dto.ItemMapping;
+import ru.practicum.shareit.item.dto.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
 
@@ -24,10 +24,10 @@ public class ItemController {
     public ItemDto addItem(@RequestHeader("X-Sharer-User-Id") Long userId,
                            @Valid @RequestBody ItemDto dto) {
         log.info("Получен POST-запрос от пользователя с id={} на добавление вещи: {}", userId, dto);
-        Item item = ItemMapping.mapDtoToItem(dto);
+        Item item = ItemMapper.mapDtoToItem(dto);
         item.setOwnerId(userId);
         item = itemService.addItem(item);
-        return ItemMapping.mapItemToDto(item);
+        return ItemMapper.mapItemToDto(item);
     }
 
     @PatchMapping("/{itemId}")
@@ -36,18 +36,18 @@ public class ItemController {
                               @RequestBody ItemDto dto) {
         log.info("Получен PATCH-запрос от пользователя с userId={} на изменение вещи itemId={}: {}",
                 userId, itemId, dto);
-        Item item = ItemMapping.mapDtoToItem(dto);
+        Item item = ItemMapper.mapDtoToItem(dto);
         item.setId(itemId);
         item.setOwnerId(userId);
         item = itemService.updateItem(item);
-        return ItemMapping.mapItemToDto(item);
+        return ItemMapper.mapItemToDto(item);
     }
 
     @GetMapping("/{itemId}")
     public ItemDto getItem(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long itemId) {
         log.info("Получен GET-запрос от пользователя с id={} на просмотр информации о вещи с id={}", userId, itemId);
         Item item = itemService.getItem(itemId);
-        return ItemMapping.mapItemToDto(item);
+        return ItemMapper.mapItemToDto(item);
     }
 
     @GetMapping
@@ -55,7 +55,7 @@ public class ItemController {
         log.info("Получен GET-запрос от пользователя с id={} на получение списка его вещей", userId);
         List<Item> items = itemService.getOwnerItems(userId);
         return items.stream()
-                .map(ItemMapping::mapItemToDto)
+                .map(ItemMapper::mapItemToDto)
                 .collect(Collectors.toList());
     }
 
@@ -64,7 +64,7 @@ public class ItemController {
         log.info("Получен GET-запрос от пользователя с id={} на поиск вещей по ключевому слову '{}'", userId, text);
         List<Item> items = itemService.searchItems(text);
         return items.stream()
-                .map(ItemMapping::mapItemToDto)
+                .map(ItemMapper::mapItemToDto)
                 .collect(Collectors.toList());
     }
 
