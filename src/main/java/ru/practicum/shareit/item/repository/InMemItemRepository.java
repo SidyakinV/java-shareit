@@ -29,7 +29,7 @@ public class InMemItemRepository implements ItemRepository {
         Item savedItem = itemsList.get(item.getId());
 
         if (savedItem != null) {
-            if (!savedItem.getOwnerId().equals(item.getOwnerId())) {
+            if (savedItem.getOwnerId() != (item.getOwnerId())) {
                 throw new NotFoundException(new Violation("owner",
                         "Редактировать информацию о вещи может только ее владелец!"));
             }
