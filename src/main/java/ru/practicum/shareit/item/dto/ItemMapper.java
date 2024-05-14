@@ -16,17 +16,20 @@ public class ItemMapper {
         dto.setAvailable(item.getAvailable());
         dto.setLastBooking(item.getLastBooking());
         dto.setNextBooking(item.getNextBooking());
+        dto.setComments(new ArrayList<>());
 
-        List<ResponseCommentDto> comments = new ArrayList<>();
-        for (Comment comment : item.getComments()) {
-            ResponseCommentDto commentDto = new ResponseCommentDto();
-            commentDto.setId(comment.getId());
-            commentDto.setText(comment.getText());
-            commentDto.setAuthorName(comment.getAuthor().getName());
-            commentDto.setCreated(comment.getCreated());
-            comments.add(commentDto);
+        List<Comment> comments = item.getComments();
+        if (comments != null) {
+            for (Comment comment : comments) {
+                ResponseCommentDto commentDto = new ResponseCommentDto();
+                commentDto.setId(comment.getId());
+                commentDto.setText(comment.getText());
+                commentDto.setAuthorName(comment.getAuthor().getName());
+                commentDto.setCreated(comment.getCreated());
+                dto.getComments().add(commentDto);
+            }
         }
-        dto.setComments(comments);
+
 
         return dto;
     }
