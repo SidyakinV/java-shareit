@@ -25,13 +25,17 @@ public interface JpaBookingRepository extends JpaRepository<Booking, Long> {
             "ORDER BY b.start DESC")
     List<Booking> getOwnerBookings(long ownerId, BookingState state);
 
-    @Query("SELECT b " +
-            "FROM Booking AS b " +
-            " JOIN FETCH b.item AS i " +
-            "WHERE b.userId = :userId " +
-            "  AND b.state = :state " +
-            "  AND i.id = :itemId")
-    List<Booking> getUserBookingItems(Long userId, Long itemId, BookingState state);
+    @Query(value =
+            "SELECT b.* " +
+            "FROM bookings AS b " +
+            "WHERE b.item_id = :itemId " +
+            "  AND b.user_id = :userId " +
+            "  AND b.end_time < now() " +
+            "  AND b.state = 'APPROVED' " +
+            "ORDER BY b.id DESC " +
+            "LIMIT 1",
+            nativeQuery = true)
+    Booking getFinishedUserBooking(Long userId, Long itemId);
 
     @Query(value =
             "SELECT b.* " +

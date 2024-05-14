@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.booking.repository.JpaBookingRepository;
 import ru.practicum.shareit.errorhandler.model.Violation;
 import ru.practicum.shareit.exceptions.NotFoundException;
@@ -85,7 +84,7 @@ public class ItemServiceImpl implements ItemService {
     public Comment addComment(Comment comment) {
         User user = getUserById(comment.getUserId());
         Item item = getItemById(comment.getItemId());
-        if (bookingRepository.getUserBookingItems(user.getId(), item.getId(), BookingState.APPROVED).size() < 1) {
+        if (bookingRepository.getFinishedUserBooking(user.getId(), item.getId()) == null) {
             throw new ValidationException(
                     new Violation("error",
                             "Комментарии могут оставлять только те пользователь, которые брали вещь в аренду"));
