@@ -77,12 +77,4 @@ public class BookingController {
         return BookingMapper.convertBookingToResponseList(list);
     }
 
-    // ToDo: убрать
-    @GetMapping("/test")
-    public List<ResponseBookingDto> getAll() {
-        log.info("Тестовый интерфейс");
-        List<Booking> list = bookingService.getAllTest();
-        return BookingMapper.convertBookingToResponseList(list);
-    }
-
 }

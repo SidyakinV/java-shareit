@@ -99,7 +99,7 @@ public class BookingServiceImpl implements BookingService {
             case REJECTED:
                 return bookingRepository.getUserBookings(userId, state);
             default:
-                return filterBookings(bookingRepository.getUserBookings(userId, BookingState.APPROVED), state);
+                return filterBookings(bookingRepository.getUserBookings(userId, null), state);
         }
     }
 
@@ -113,13 +113,8 @@ public class BookingServiceImpl implements BookingService {
             case REJECTED:
                 return bookingRepository.getOwnerBookings(ownerId, state);
             default:
-                return filterBookings(bookingRepository.getOwnerBookings(ownerId, BookingState.APPROVED), state);
+                return filterBookings(bookingRepository.getOwnerBookings(ownerId, null), state);
         }
-    }
-
-    @Override
-    public List<Booking> getAllTest() {
-        return bookingRepository.findAll();
     }
 
     private void checkUserExists(Long userId) {

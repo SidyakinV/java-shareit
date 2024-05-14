@@ -15,6 +15,4 @@ public interface BookingService {
 
     List<Booking> getOwnerBookings(long ownerId, BookingState state);
 
-    List<Booking> getAllTest();
-
 }
