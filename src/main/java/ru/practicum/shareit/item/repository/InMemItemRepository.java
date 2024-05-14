@@ -5,10 +5,7 @@ import ru.practicum.shareit.errorhandler.model.Violation;
 import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.item.model.Item;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
@@ -29,7 +26,7 @@ public class InMemItemRepository implements ItemRepository {
         Item savedItem = itemsList.get(item.getId());
 
         if (savedItem != null) {
-            if (savedItem.getOwnerId() != (item.getOwnerId())) {
+            if (!Objects.equals(savedItem.getOwnerId(), item.getOwnerId())) {
                 throw new NotFoundException(new Violation("owner",
                         "Редактировать информацию о вещи может только ее владелец!"));
             }

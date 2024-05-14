@@ -4,11 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingState;
-import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.item.model.OwnerBookingInfo;
 
-import javax.persistence.EntityManager;
-import java.time.LocalDateTime;
 import java.util.List;
 
 public interface JpaBookingRepository extends JpaRepository<Booking, Long> {

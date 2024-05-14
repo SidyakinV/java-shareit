@@ -15,6 +15,7 @@ import ru.practicum.shareit.user.repository.JpaUserRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,7 +35,7 @@ public class BookingServiceImpl implements BookingService{
             throw new ValidationException(
                     new Violation("Available", "Данная вещь недоступна для бронирования!"));
         }
-        if (booking.getItem().getOwnerId() == booking.getUserId()) {
+        if (Objects.equals(booking.getItem().getOwnerId(), booking.getUserId())) {
             throw new NotFoundException(
                     new Violation("Owner", "Вещь бронируется владельцем!"));
         }
