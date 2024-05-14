@@ -147,7 +147,7 @@ public class BookingServiceImpl implements BookingService {
                         .collect(Collectors.toList());
             case CURRENT:
                 return bookings.stream()
-                        .filter(booking -> !(LocalDateTime.now().isBefore(booking.getStart()) &&
+                        .filter(booking -> !(LocalDateTime.now().isBefore(booking.getStart()) ||
                                 LocalDateTime.now().isAfter(booking.getEnd())))
                         .collect(Collectors.toList());
             default:
