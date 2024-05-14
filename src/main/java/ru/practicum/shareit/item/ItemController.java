@@ -21,7 +21,7 @@ public class ItemController {
     private final ItemService itemService;
 
     @PostMapping
-    public ItemDto addItem(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public ResponseItemDto addItem(@RequestHeader("X-Sharer-User-Id") Long userId,
                            @Valid @RequestBody ItemDto dto) {
         log.info("Получен POST-запрос от пользователя с id={} на добавление вещи: {}", userId, dto);
         Item item = ItemMapper.mapDtoToItem(dto);
@@ -31,7 +31,7 @@ public class ItemController {
     }
 
     @PatchMapping("/{itemId}")
-    public ItemDto updateItem(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public ResponseItemDto updateItem(@RequestHeader("X-Sharer-User-Id") Long userId,
                               @PathVariable Long itemId,
                               @RequestBody ItemDto dto) {
         log.info("Получен PATCH-запрос от пользователя с userId={} на изменение вещи itemId={}: {}",
@@ -44,14 +44,14 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto getItem(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long itemId) {
+    public ResponseItemDto getItem(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long itemId) {
         log.info("Получен GET-запрос от пользователя с id={} на просмотр информации о вещи с id={}", userId, itemId);
-        Item item = itemService.getItem(itemId);
+        Item item = itemService.getItem(itemId, userId);
         return ItemMapper.mapItemToDto(item);
     }
 
     @GetMapping
-    public List<ItemDto> getOwnerItems(@RequestHeader("X-Sharer-User-Id") Long userId) {
+    public List<ResponseItemDto> getOwnerItems(@RequestHeader("X-Sharer-User-Id") Long userId) {
         log.info("Получен GET-запрос от пользователя с id={} на получение списка его вещей", userId);
         List<Item> items = itemService.getOwnerItems(userId);
         return items.stream()
@@ -60,7 +60,7 @@ public class ItemController {
     }
 
     @GetMapping("/search")
-    public List<ItemDto> searchItems(@RequestHeader("X-Sharer-User-Id") Long userId, @RequestParam String text) {
+    public List<ResponseItemDto> searchItems(@RequestHeader("X-Sharer-User-Id") Long userId, @RequestParam String text) {
         log.info("Получен GET-запрос от пользователя с id={} на поиск вещей по ключевому слову '{}'", userId, text);
         List<Item> items = itemService.searchItems(text);
         return items.stream()

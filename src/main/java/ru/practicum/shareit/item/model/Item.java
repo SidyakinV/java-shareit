@@ -3,6 +3,7 @@ package ru.practicum.shareit.item.model;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "items")
@@ -23,4 +24,13 @@ public class Item {
 
     @Column(name = "is_available", nullable = false)
     private Boolean available;
+
+    @Transient
+    private OwnerBookingInfo lastBooking;
+
+    @Transient
+    private OwnerBookingInfo nextBooking;
+
+    @Transient
+    private List<Comment> comments;
 }

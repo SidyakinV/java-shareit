@@ -1,16 +1,34 @@
 package ru.practicum.shareit.item.dto;
 
+import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ItemMapper {
 
-    public static ItemDto mapItemToDto(Item item) {
-        return ItemDto.builder()
-                .id(item.getId())
-                .name(item.getName())
-                .description(item.getDescription())
-                .available(item.getAvailable())
-                .build();
+    public static ResponseItemDto mapItemToDto(Item item) {
+        ResponseItemDto dto = new ResponseItemDto();
+        dto.setId(item.getId());
+        dto.setName(item.getName());
+        dto.setDescription(item.getDescription());
+        dto.setAvailable(item.getAvailable());
+        dto.setLastBooking(item.getLastBooking());
+        dto.setNextBooking(item.getNextBooking());
+
+        List<ResponseCommentDto> comments = new ArrayList<>();
+        for (Comment comment : item.getComments()) {
+            ResponseCommentDto commentDto = new ResponseCommentDto();
+            commentDto.setId(comment.getId());
+            commentDto.setText(comment.getText());
+            commentDto.setAuthorName(comment.getAuthor().getName());
+            commentDto.setCreated(comment.getCreated());
+            comments.add(commentDto);
+        }
+        dto.setComments(comments);
+
+        return dto;
     }
 
     public static Item mapDtoToItem(ItemDto dto) {

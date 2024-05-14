@@ -34,6 +34,10 @@ public class BookingServiceImpl implements BookingService{
             throw new ValidationException(
                     new Violation("Available", "Данная вещь недоступна для бронирования!"));
         }
+        if (booking.getItem().getOwnerId() == booking.getUserId()) {
+            throw new NotFoundException(
+                    new Violation("Owner", "Вещь бронируется владельцем!"));
+        }
         if (booking.getEnd().isBefore(booking.getStart()) || booking.getEnd().isBefore(LocalDateTime.now())) {
             throw new ValidationException(
                     new Violation("EndDate", "Некорректная дата завершения бронирования!"));
@@ -56,6 +60,10 @@ public class BookingServiceImpl implements BookingService{
             throw new NotFoundException(
                     new Violation("OwnerID", "Подтверждение бронирования выполняется владельцем вещи"));
         }
+        if (booking.getState() != BookingState.WAITING) {
+            throw new ValidationException(
+                    new Violation("State", "Подтверждение бронирования возможно только для статуса WAITING"));
+        }
 
         if (approved) {
             booking.setState(BookingState.APPROVED);
@@ -72,7 +80,7 @@ public class BookingServiceImpl implements BookingService{
     public Booking getBookingInfo(long userId, long bookingId) {
         Booking booking = getBookingById(bookingId);
         if (booking.getUserId() != userId && booking.getItem().getOwnerId() != userId) {
-            throw new ValidationException(
+            throw new NotFoundException(
                     new Violation("info",
                             "Просмотр доступен владельцу вещи или пользователю, создавшего бронирование"));
 

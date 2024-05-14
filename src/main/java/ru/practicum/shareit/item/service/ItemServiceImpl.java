@@ -3,6 +3,7 @@ package ru.practicum.shareit.item.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.booking.repository.JpaBookingRepository;
 import ru.practicum.shareit.errorhandler.model.Violation;
@@ -11,6 +12,7 @@ import ru.practicum.shareit.exceptions.ValidationException;
 import ru.practicum.shareit.item.dto.ItemMapper;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.model.OwnerBookingInfo;
 import ru.practicum.shareit.item.repository.JpaCommentRepository;
 import ru.practicum.shareit.item.repository.JpaItemRepository;
 import ru.practicum.shareit.user.model.User;
@@ -51,8 +53,10 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Item getItem(Long itemId) {
+    public Item getItem(Long itemId, Long userId) {
         Item item = getItemById(itemId);
+        item.setComments(commentRepository.findByItemId(itemId));
+        patchOwnerBookingInfo(item, userId);
         log.info("Получена информация о вещи с id={}: {}", itemId, item);
         return item;
     }
@@ -60,6 +64,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public List<Item> getOwnerItems(Long userId) {
         List<Item> items = itemRepository.findByOwnerId(userId);
+        items.replaceAll(item -> patchOwnerBookingInfo(item, userId));
         log.info("Получен список вещей пользователя (count: {})", items.size());
         return items;
     }
@@ -85,9 +90,11 @@ public class ItemServiceImpl implements ItemService {
                     new Violation("error",
                             "Комментарии могут оставлять только те пользователь, которые брали вещь в аренду"));
         }
+
+        comment.setAuthor(user);
         comment.setCreated(LocalDateTime.now());
         Comment savedComment = commentRepository.save(comment);
-        savedComment.setAuthorName(user.getName());
+
         log.info("Комментарий добавлен: {}", savedComment);
         return savedComment;
     }
@@ -109,6 +116,27 @@ public class ItemServiceImpl implements ItemService {
             throw new ValidationException(
                     new Violation(name, name + " вещи не может быть пустым!"));
         }
+    }
+
+    private OwnerBookingInfo getBookingInfo(Booking booking) {
+        if (booking == null) {
+            return null;
+        }
+        OwnerBookingInfo bookingInfo = new OwnerBookingInfo();
+        bookingInfo.setBookingId(booking.getId());
+        bookingInfo.setBookerId(booking.getUserId());
+        return bookingInfo;
+    }
+
+    private Item patchOwnerBookingInfo(Item item, Long userId) {
+        OwnerBookingInfo lastBooking = getBookingInfo(
+                bookingRepository.getLastBooking(item.getId(), userId));
+        OwnerBookingInfo nextBooking = getBookingInfo(
+                bookingRepository.getNextBooking(item.getId(), userId));
+
+        item.setLastBooking(lastBooking);
+        item.setNextBooking(nextBooking);
+        return item;
     }
 
 }
