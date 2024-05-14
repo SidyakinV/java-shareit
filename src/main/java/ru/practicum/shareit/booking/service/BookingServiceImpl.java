@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class BookingServiceImpl implements BookingService{
+public class BookingServiceImpl implements BookingService {
 
     private final JpaItemRepository itemRepository;
     private final JpaUserRepository userRepository;
@@ -119,8 +119,7 @@ public class BookingServiceImpl implements BookingService{
 
     @Override
     public List<Booking> getAllTest() {
-        List<Booking> list = bookingRepository.findAll();
-        return list;
+        return bookingRepository.findAll();
     }
 
     private void checkUserExists(Long userId) {

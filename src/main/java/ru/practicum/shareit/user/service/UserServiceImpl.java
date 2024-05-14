@@ -36,7 +36,7 @@ public class UserServiceImpl implements UserService {
         checkNotBlankField(user.getEmail(), "EMail");
         checkValidEmail(user.getEmail());
 
-        User oldUser= getUserById(user.getId());
+        User oldUser = getUserById(user.getId());
         User savedUser = userRepository.save(UserMapper.patchUser(oldUser, user));
         log.info("Информация о пользователе изменена: {}", savedUser);
         return savedUser;
@@ -44,7 +44,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUser(Long userId) {
-        User user= getUserById(userId);
+        User user = getUserById(userId);
         log.info("Получена информация о пользователе c id={}: {}", userId, user);
         return user;
     }
