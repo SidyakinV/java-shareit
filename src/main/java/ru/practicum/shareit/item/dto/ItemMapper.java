@@ -1,10 +1,6 @@
 package ru.practicum.shareit.item.dto;
 
-import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class ItemMapper {
 
@@ -14,23 +10,6 @@ public class ItemMapper {
         dto.setName(item.getName());
         dto.setDescription(item.getDescription());
         dto.setAvailable(item.getAvailable());
-        dto.setLastBooking(item.getLastBooking());
-        dto.setNextBooking(item.getNextBooking());
-        dto.setComments(new ArrayList<>());
-
-        List<Comment> comments = item.getComments();
-        if (comments != null) {
-            for (Comment comment : comments) {
-                CommentResponseDto commentDto = new CommentResponseDto();
-                commentDto.setId(comment.getId());
-                commentDto.setText(comment.getText());
-                commentDto.setAuthorName(comment.getAuthor().getName());
-                commentDto.setCreated(comment.getCreated());
-                dto.getComments().add(commentDto);
-            }
-        }
-
-
         return dto;
     }
 

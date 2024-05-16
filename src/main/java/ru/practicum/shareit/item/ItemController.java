@@ -44,26 +44,31 @@ public class ItemController {
     @GetMapping("/{itemId}")
     public ItemResponseDto getItem(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long itemId) {
         log.info("Получен GET-запрос от пользователя с id={} на просмотр информации о вещи с id={}", userId, itemId);
-        Item item = itemService.getItem(itemId, userId);
-        return ItemMapper.mapItemToDto(item);
+        return itemService.getItem(itemId, userId);
     }
 
     @GetMapping
     public List<ItemResponseDto> getOwnerItems(@RequestHeader("X-Sharer-User-Id") Long userId) {
         log.info("Получен GET-запрос от пользователя с id={} на получение списка его вещей", userId);
+        /*
         List<Item> items = itemService.getOwnerItems(userId);
         return items.stream()
                 .map(ItemMapper::mapItemToDto)
                 .collect(Collectors.toList());
+        */
+        return itemService.getOwnerItems(userId);
     }
 
     @GetMapping("/search")
     public List<ItemResponseDto> searchItems(@RequestHeader("X-Sharer-User-Id") Long userId, @RequestParam String text) {
         log.info("Получен GET-запрос от пользователя с id={} на поиск вещей по ключевому слову '{}'", userId, text);
+        /*
         List<Item> items = itemService.searchItems(text);
         return items.stream()
                 .map(ItemMapper::mapItemToDto)
                 .collect(Collectors.toList());
+        */
+        return itemService.searchItems(text);
     }
 
     @PostMapping("/{itemId}/comment")

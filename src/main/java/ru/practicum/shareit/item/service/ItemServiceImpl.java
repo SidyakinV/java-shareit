@@ -8,10 +8,7 @@ import ru.practicum.shareit.booking.repository.JpaBookingRepository;
 import ru.practicum.shareit.errorhandler.model.Violation;
 import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.exceptions.ValidationException;
-import ru.practicum.shareit.item.dto.CommentDto;
-import ru.practicum.shareit.item.dto.CommentMapper;
-import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.dto.ItemMapper;
+import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.model.OwnerBookingInfo;
@@ -23,6 +20,7 @@ import ru.practicum.shareit.user.repository.JpaUserRepository;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -59,24 +57,33 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Item getItem(Long itemId, Long userId) {
+    public ItemResponseDto getItem(Long itemId, Long userId) {
         Item item = getItemById(itemId);
-        item.setComments(commentRepository.findByItemId(itemId));
-        patchOwnerBookingInfo(item, userId);
         log.info("Получена информация о вещи с id={}: {}", itemId, item);
-        return item;
+
+        ItemResponseDto dto = ItemMapper.mapItemToDto(item);
+
+        List<Comment> comments = commentRepository.findByItemId(itemId);
+        dto.setComments(CommentMapper.mapCommentsToListDto(comments));
+
+        patchOwnerBookingInfo(dto, userId);
+
+        return dto;
     }
 
     @Override
-    public List<Item> getOwnerItems(Long userId) {
+    public List<ItemResponseDto> getOwnerItems(Long userId) {
         List<Item> items = itemRepository.findByOwnerId(userId);
-        items.replaceAll(item -> patchOwnerBookingInfo(item, userId));
         log.info("Получен список вещей пользователя (count: {})", items.size());
-        return items;
+
+        return items.stream()
+                .map(ItemMapper::mapItemToDto)
+                .map(item -> patchOwnerBookingInfo(item, userId))
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<Item> searchItems(String text) {
+    public List<ItemResponseDto> searchItems(String text) {
         if (text.isEmpty()) {
             log.info("Не определены критерии поиска вещи");
             return new ArrayList<>();
@@ -84,7 +91,10 @@ public class ItemServiceImpl implements ItemService {
 
         List<Item> items = itemRepository.searchItems(text.toLowerCase());
         log.info("Сформирован список вещей по фразе '{}'. Найдено совпадений: {}", text, items.size());
-        return items;
+
+        return items.stream()
+                .map(ItemMapper::mapItemToDto)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -135,15 +145,15 @@ public class ItemServiceImpl implements ItemService {
         return bookingInfo;
     }
 
-    private Item patchOwnerBookingInfo(Item item, Long userId) {
+    private ItemResponseDto patchOwnerBookingInfo(ItemResponseDto dto, Long userId) {
         OwnerBookingInfo lastBooking = getBookingInfo(
-                bookingRepository.getLastBooking(item.getId(), userId));
+                bookingRepository.getLastBooking(dto.getId(), userId));
         OwnerBookingInfo nextBooking = getBookingInfo(
-                bookingRepository.getNextBooking(item.getId(), userId));
+                bookingRepository.getNextBooking(dto.getId(), userId));
 
-        item.setLastBooking(lastBooking);
-        item.setNextBooking(nextBooking);
-        return item;
+        dto.setLastBooking(lastBooking);
+        dto.setNextBooking(nextBooking);
+        return dto;
     }
 
 }
