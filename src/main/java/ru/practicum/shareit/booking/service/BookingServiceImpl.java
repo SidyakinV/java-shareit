@@ -3,6 +3,8 @@ package ru.practicum.shareit.booking.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.booking.repository.JpaBookingRepository;
@@ -11,6 +13,7 @@ import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.exceptions.ValidationException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.JpaItemRepository;
+import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.JpaUserRepository;
 
 import java.time.LocalDateTime;
@@ -28,14 +31,16 @@ public class BookingServiceImpl implements BookingService {
     private final JpaBookingRepository bookingRepository;
 
     @Override
-    public Booking addBooking(Booking booking) {
-        checkUserExists(booking.getUserId());
-        booking.setItem(getItemById(booking.getItemId()));
+    public Booking addBooking(BookingDto dto) {
+        Booking booking = BookingMapper.mapDtoToBooking(dto);
+        booking.setUser(getUserById(dto.getUserId()));
+        booking.setItem(getItemById(dto.getItemId()));
+
         if (!booking.getItem().getAvailable()) {
             throw new ValidationException(
                     new Violation("Available", "Данная вещь недоступна для бронирования!"));
         }
-        if (Objects.equals(booking.getItem().getOwnerId(), booking.getUserId())) {
+        if (Objects.equals(booking.getItem().getOwner().getId(), booking.getUser().getId())) {
             throw new NotFoundException(
                     new Violation("Owner", "Вещь бронируется владельцем!"));
         }
@@ -57,7 +62,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public Booking approveBooking(long userId, long bookingId, boolean approved) {
         Booking booking = getBookingById(bookingId);
-        if (booking.getItem().getOwnerId() != userId) {
+        if (booking.getItem().getOwner().getId() != userId) {
             throw new NotFoundException(
                     new Violation("OwnerID", "Подтверждение бронирования выполняется владельцем вещи"));
         }
@@ -80,7 +85,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public Booking getBookingInfo(long userId, long bookingId) {
         Booking booking = getBookingById(bookingId);
-        if (booking.getUserId() != userId && booking.getItem().getOwnerId() != userId) {
+        if (booking.getUser().getId() != userId && booking.getItem().getOwner().getId() != userId) {
             throw new NotFoundException(
                     new Violation("info",
                             "Просмотр доступен владельцу вещи или пользователю, создавшего бронирование"));
@@ -91,7 +96,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<Booking> getUserBookings(long userId, BookingState state) {
-        checkUserExists(userId);
+        getUserById(userId);
         switch (state) {
             case ALL:
                 return bookingRepository.getUserBookings(userId, null);
@@ -105,7 +110,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<Booking> getOwnerBookings(long ownerId, BookingState state) {
-        checkUserExists(ownerId);
+        getUserById(ownerId);
         switch (state) {
             case ALL:
                 return bookingRepository.getOwnerBookings(ownerId, null);
@@ -117,8 +122,8 @@ public class BookingServiceImpl implements BookingService {
         }
     }
 
-    private void checkUserExists(Long userId) {
-        userRepository.findById(userId).orElseThrow(() ->
+    private User getUserById(Long userId) {
+        return userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException(
                         new Violation("user", String.format("Пользователь с id=%d не найден!", userId))));
     }
@@ -135,24 +140,20 @@ public class BookingServiceImpl implements BookingService {
                         new Violation("Booking", String.format("Не найдено бронирование с id=%d!", bookingId))));
     }
 
-    private List<Booking> filterBookings(List<Booking> bookings, BookingState state) {
-        switch (state) {
-            case PAST:
-                return bookings.stream()
-                        .filter(booking -> booking.getEnd().isBefore(LocalDateTime.now()))
-                        .collect(Collectors.toList());
-            case FUTURE:
-                return bookings.stream()
-                        .filter(booking -> booking.getStart().isAfter(LocalDateTime.now()))
-                        .collect(Collectors.toList());
-            case CURRENT:
-                return bookings.stream()
-                        .filter(booking -> !(LocalDateTime.now().isBefore(booking.getStart()) ||
-                                LocalDateTime.now().isAfter(booking.getEnd())))
-                        .collect(Collectors.toList());
-            default:
-                return null;
+    private BookingState getBookingPeriodState(Booking booking) {
+        if (booking.getEnd().isBefore(LocalDateTime.now())) {
+            return BookingState.PAST;
+        } else if (booking.getStart().isAfter(LocalDateTime.now())) {
+            return BookingState.FUTURE;
+        } else {
+            return BookingState.CURRENT;
         }
+    }
+
+    private List<Booking> filterBookings(List<Booking> bookings, BookingState state) {
+        return bookings.stream()
+                .filter(booking -> getBookingPeriodState(booking) == state)
+                .collect(Collectors.toList());
     }
 
 }

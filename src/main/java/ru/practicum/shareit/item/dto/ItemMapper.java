@@ -8,8 +8,8 @@ import java.util.List;
 
 public class ItemMapper {
 
-    public static ResponseItemDto mapItemToDto(Item item) {
-        ResponseItemDto dto = new ResponseItemDto();
+    public static ItemResponseDto mapItemToDto(Item item) {
+        ItemResponseDto dto = new ItemResponseDto();
         dto.setId(item.getId());
         dto.setName(item.getName());
         dto.setDescription(item.getDescription());
@@ -21,7 +21,7 @@ public class ItemMapper {
         List<Comment> comments = item.getComments();
         if (comments != null) {
             for (Comment comment : comments) {
-                ResponseCommentDto commentDto = new ResponseCommentDto();
+                CommentResponseDto commentDto = new CommentResponseDto();
                 commentDto.setId(comment.getId());
                 commentDto.setText(comment.getText());
                 commentDto.setAuthorName(comment.getAuthor().getName());

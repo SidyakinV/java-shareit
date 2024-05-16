@@ -15,12 +15,6 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Transient
-    private Long userId;
-
-    @Column(name = "item_id", nullable = false)
-    private Long itemId;
-
     @Column(name = "text", nullable = false)
     private String text;
 
@@ -30,5 +24,9 @@ public class Comment {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User author;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "item_id")
+    private Item item;
 
 }

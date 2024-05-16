@@ -12,7 +12,8 @@ public interface JpaBookingRepository extends JpaRepository<Booking, Long> {
     @Query("SELECT b " +
             "FROM Booking AS b " +
             "  JOIN FETCH b.item " +
-            "WHERE b.userId = :userId " +
+            "  JOIN FETCH b.user " +
+            "WHERE b.user.id = :userId " +
             "  AND (:state is null OR b.state = :state) " +
             "ORDER BY b.start DESC")
     List<Booking> getUserBookings(long userId, BookingState state);
@@ -20,7 +21,8 @@ public interface JpaBookingRepository extends JpaRepository<Booking, Long> {
     @Query("SELECT b " +
             "FROM Booking AS b " +
             "  JOIN FETCH b.item AS i " +
-            "WHERE i.ownerId = :ownerId " +
+            "  JOIN FETCH b.user AS u " +
+            "WHERE i.owner.id = :ownerId " +
             "  AND (:state is null OR b.state = :state) " +
             "ORDER BY b.start DESC")
     List<Booking> getOwnerBookings(long ownerId, BookingState state);

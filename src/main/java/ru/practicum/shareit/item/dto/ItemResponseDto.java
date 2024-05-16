@@ -6,7 +6,7 @@ import ru.practicum.shareit.item.model.OwnerBookingInfo;
 import java.util.List;
 
 @Data
-public class ResponseItemDto {
+public class ItemResponseDto {
 
     private Long id;
     private String name;
@@ -14,5 +14,5 @@ public class ResponseItemDto {
     private Boolean available;
     private OwnerBookingInfo lastBooking;
     private OwnerBookingInfo nextBooking;
-    private List<ResponseCommentDto> comments;
+    private List<CommentResponseDto> comments;
 }

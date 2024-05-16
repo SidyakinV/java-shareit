@@ -19,4 +19,6 @@ public class ItemDto {
     @NotNull(message = "Не задана доступность вещи для аренды!")
     private Boolean available;
 
+    private Long ownerId;
+
 }

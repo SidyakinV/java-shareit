@@ -18,4 +18,6 @@ public class BookingDto {
 
     @NotBlank
     private String end;
+
+    private Long userId;
 }

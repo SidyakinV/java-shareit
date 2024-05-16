@@ -10,4 +10,7 @@ public class CommentDto {
     @NotBlank
     private String text;
 
+    private Long itemId;
+    private Long userId;
+
 }

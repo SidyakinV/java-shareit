@@ -8,6 +8,9 @@ import ru.practicum.shareit.booking.repository.JpaBookingRepository;
 import ru.practicum.shareit.errorhandler.model.Violation;
 import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.exceptions.ValidationException;
+import ru.practicum.shareit.item.dto.CommentDto;
+import ru.practicum.shareit.item.dto.CommentMapper;
+import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemMapper;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
@@ -32,16 +35,20 @@ public class ItemServiceImpl implements ItemService {
     private final JpaCommentRepository commentRepository;
 
     @Override
-    public Item addItem(Item item) {
-        getUserById(item.getOwnerId());
+    public Item addItem(ItemDto dto) {
+        Item item = ItemMapper.mapDtoToItem(dto);
+        item.setOwner(getUserById(dto.getOwnerId()));
+
         Item savedItem = itemRepository.save(item);
         log.info("Добавлена новая вещь: {}", savedItem);
         return savedItem;
     }
 
     @Override
-    public Item updateItem(Item item) {
-        getUserById(item.getOwnerId());
+    public Item updateItem(ItemDto dto) {
+        Item item = ItemMapper.mapDtoToItem(dto);
+        item.setOwner(getUserById(dto.getOwnerId()));
+
         checkNotBlankField(item.getName(), "Название");
         checkNotBlankField(item.getDescription(), "Описание");
 
@@ -81,16 +88,17 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Comment addComment(Comment comment) {
-        User user = getUserById(comment.getUserId());
-        Item item = getItemById(comment.getItemId());
-        if (bookingRepository.getFinishedUserBooking(user.getId(), item.getId()) == null) {
+    public Comment addComment(CommentDto dto) {
+        Comment comment = CommentMapper.mapDtoToComment(dto);
+        comment.setItem(getItemById(dto.getItemId()));
+        comment.setAuthor(getUserById(dto.getUserId()));
+
+        if (bookingRepository.getFinishedUserBooking(dto.getUserId(), dto.getItemId()) == null) {
             throw new ValidationException(
                     new Violation("error",
                             "Комментарии могут оставлять только те пользователь, которые брали вещь в аренду"));
         }
 
-        comment.setAuthor(user);
         comment.setCreated(LocalDateTime.now());
         Comment savedComment = commentRepository.save(comment);
 
@@ -123,7 +131,7 @@ public class ItemServiceImpl implements ItemService {
         }
         OwnerBookingInfo bookingInfo = new OwnerBookingInfo();
         bookingInfo.setBookingId(booking.getId());
-        bookingInfo.setBookerId(booking.getUserId());
+        bookingInfo.setBookerId(booking.getUser().getId());
         return bookingInfo;
     }
 

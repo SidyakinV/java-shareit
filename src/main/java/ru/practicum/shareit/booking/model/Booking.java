@@ -2,6 +2,7 @@ package ru.practicum.shareit.booking.model;
 
 import lombok.Data;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -14,12 +15,6 @@ public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Transient
-    private Long itemId;
-
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
 
     @Column(name = "start_time", nullable = false)
     private LocalDateTime start;
@@ -34,5 +29,9 @@ public class Booking {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
     private Item item;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
 }

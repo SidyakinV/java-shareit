@@ -10,8 +10,8 @@ public class CommentMapper {
         return comment;
     }
 
-    public static ResponseCommentDto mapCommentToResponseDto(Comment comment) {
-        ResponseCommentDto dto = new ResponseCommentDto();
+    public static CommentResponseDto mapCommentToResponseDto(Comment comment) {
+        CommentResponseDto dto = new CommentResponseDto();
         dto.setId(comment.getId());
         dto.setText(comment.getText());
         dto.setCreated(comment.getCreated());

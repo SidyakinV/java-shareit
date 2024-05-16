@@ -26,7 +26,7 @@ public class InMemItemRepository implements ItemRepository {
         Item savedItem = itemsList.get(item.getId());
 
         if (savedItem != null) {
-            if (!Objects.equals(savedItem.getOwnerId(), item.getOwnerId())) {
+            if (!Objects.equals(savedItem.getOwner().getId(), item.getOwner().getId())) {
                 throw new NotFoundException(new Violation("owner",
                         "Редактировать информацию о вещи может только ее владелец!"));
             }
@@ -54,7 +54,7 @@ public class InMemItemRepository implements ItemRepository {
     @Override
     public List<Item> getOwnerItems(long userId) {
         return itemsList.values().stream()
-                .filter(item -> item.getOwnerId() == userId)
+                .filter(item -> item.getOwner().getId() == userId)
                 .collect(Collectors.toList());
     }
 
