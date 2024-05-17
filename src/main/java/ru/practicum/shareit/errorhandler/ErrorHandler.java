@@ -10,11 +10,13 @@ import ru.practicum.shareit.errorhandler.model.ValidationErrorResponse;
 import ru.practicum.shareit.errorhandler.model.Violation;
 import ru.practicum.shareit.exceptions.ConflictException;
 import ru.practicum.shareit.exceptions.NotFoundException;
+import ru.practicum.shareit.exceptions.UnsupportedException;
 import ru.practicum.shareit.exceptions.ValidationException;
 
 import javax.validation.ConstraintViolationException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
@@ -68,6 +70,13 @@ public class ErrorHandler {
         violations.add(e.getViolation());
         log.info("Exception (onConflictException): " + e.getMessage());
         return new ValidationErrorResponse(violations);
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> onUnsupportedException(final UnsupportedException e) {
+        log.error(e.getMessage());
+        return Map.of("error", e.getMessage());
     }
 
 }
