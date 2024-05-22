@@ -81,7 +81,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
                 .collect(Collectors.toList());
     }
 
-    private List<RequestWithAnswerDto> getRequestWithAnswerDtoList (List<ItemRequest> requests) {
+    private List<RequestWithAnswerDto> getRequestWithAnswerDtoList(List<ItemRequest> requests) {
         return requests.stream()
                 .map(itemRequest ->
                         ItemRequestMapper.mapRequestWithAnswerDto(itemRequest, getItemsByRequest(itemRequest.getId())))
