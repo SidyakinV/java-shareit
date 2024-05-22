@@ -1,5 +1,7 @@
 package ru.practicum.shareit.booking.repository;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import ru.practicum.shareit.booking.model.Booking;
@@ -7,25 +9,25 @@ import ru.practicum.shareit.booking.model.BookingState;
 
 import java.util.List;
 
-public interface JpaBookingRepository extends JpaRepository<Booking, Long> {
+public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     @Query("SELECT b " +
             "FROM Booking AS b " +
-            "  JOIN FETCH b.item " +
-            "  JOIN FETCH b.user " +
+            "  JOIN b.item " +
+            "  JOIN b.user " +
             "WHERE b.user.id = :userId " +
             "  AND (:state is null OR b.state = :state) " +
             "ORDER BY b.start DESC")
-    List<Booking> getUserBookings(long userId, BookingState state);
+    Slice<Booking> getUserBookings(long userId, BookingState state, Pageable pageable);
 
     @Query("SELECT b " +
             "FROM Booking AS b " +
-            "  JOIN FETCH b.item AS i " +
-            "  JOIN FETCH b.user AS u " +
+            "  JOIN b.item AS i " +
+            "  JOIN b.user AS u " +
             "WHERE i.owner.id = :ownerId " +
             "  AND (:state is null OR b.state = :state) " +
             "ORDER BY b.start DESC")
-    List<Booking> getOwnerBookings(long ownerId, BookingState state);
+    Slice<Booking> getOwnerBookings(long ownerId, BookingState state, Pageable pageable);
 
     @Query(value =
             "SELECT b.* " +

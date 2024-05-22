@@ -10,6 +10,7 @@ public class ItemMapper {
         dto.setName(item.getName());
         dto.setDescription(item.getDescription());
         dto.setAvailable(item.getAvailable());
+        dto.setRequestId(item.getRequestId());
         return dto;
     }
 
@@ -19,6 +20,7 @@ public class ItemMapper {
         item.setName(dto.getName());
         item.setDescription(dto.getDescription());
         item.setAvailable(dto.getAvailable());
+        item.setRequestId(dto.getRequestId());
         return item;
     }
 

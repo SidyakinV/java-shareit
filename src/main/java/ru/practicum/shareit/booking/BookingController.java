@@ -2,6 +2,8 @@ package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingMapper;
@@ -24,7 +26,8 @@ public class BookingController {
     @PostMapping
     public BookingResponseDto addBooking(
             @RequestHeader("X-Sharer-User-Id") Long userId,
-            @Valid @RequestBody BookingDto dto) {
+            @Valid @RequestBody BookingDto dto
+    ) {
         log.info("Получен запрос на бронирование от пользователя с id={}: {}", userId, dto);
         dto.setUserId(userId);
         Booking booking = bookingService.addBooking(dto);
@@ -35,7 +38,8 @@ public class BookingController {
     public BookingResponseDto approveBooking(
             @RequestHeader("X-Sharer-User-Id") Long userId,
             @PathVariable Long bookingId,
-            @RequestParam Boolean approved) {
+            @RequestParam Boolean approved
+    ) {
         log.info(
                 "Получен запрос на подтверждение бронирования (bookingId={}) от пользователя userId={}, " +
                         "статус {}", bookingId, userId, approved);
@@ -46,7 +50,8 @@ public class BookingController {
     @GetMapping("/{bookingId}")
     public BookingResponseDto getBookingInfo(
             @RequestHeader("X-Sharer-User-Id") Long userId,
-            @PathVariable Long bookingId) {
+            @PathVariable Long bookingId
+    ) {
         log.info(
                 "Получен запрос на получение информации о бронировании (bookingId={}) от пользователя userId={}",
                 bookingId, userId);
@@ -57,22 +62,48 @@ public class BookingController {
     @GetMapping
     public List<BookingResponseDto> getUserBookings(
             @RequestHeader("X-Sharer-User-Id") Long userId,
-            @RequestParam(defaultValue = "ALL") String state) {
-        log.info(
-                "Получен запрос на получение списка бронирования вещей пользователем с id={} " +
-                        "и статусом бронирования {}", userId, state);
-        List<Booking> list = bookingService.getUserBookings(userId, BookingState.stringToBookingState(state));
+            @RequestParam(defaultValue = "ALL") String state,
+            @RequestParam(required = false) Integer from,
+            @RequestParam(defaultValue = "20") Integer size
+    ) {
+        Pageable pageable;
+        BookingState bookingState = BookingState.stringToBookingState(state);
+        if (from != null && bookingState == BookingState.ALL) {
+            log.info(
+                    "Получен запрос на получение списка бронирования вещей пользователем с id={} " +
+                            "и пагинацией (from={}, size={})", userId, from, size);
+            pageable = PageRequest.of(from / size, size);
+        } else {
+            log.info(
+                    "Получен запрос на получение списка бронирования вещей пользователем с id={} " +
+                            "и статусом бронирования {}", userId, state);
+            pageable = Pageable.unpaged();
+        }
+        List<Booking> list = bookingService.getUserBookings(userId, bookingState, pageable);
         return BookingMapper.convertBookingToResponseList(list);
     }
 
     @GetMapping("/owner")
     public List<BookingResponseDto> getOwnerBookings(
             @RequestHeader("X-Sharer-User-Id") Long ownerId,
-            @RequestParam(defaultValue = "ALL") String state) {
-        log.info(
-                "Получен запрос на получение списка бронирования вещей, принадлежащих владельцу с id={} " +
-                        "и статусом бронирования {}", ownerId, state);
-        List<Booking> list = bookingService.getOwnerBookings(ownerId, BookingState.stringToBookingState(state));
+            @RequestParam(defaultValue = "ALL") String state,
+            @RequestParam(required = false) Integer from,
+            @RequestParam(defaultValue = "20") Integer size
+    ) {
+        Pageable pageable;
+        BookingState bookingState = BookingState.stringToBookingState(state);
+        if (from != null && bookingState == BookingState.ALL) {
+            log.info(
+                    "Получен запрос на получение списка бронирования вещей, принадлежащих владельцу с id={} " +
+                            "и пагинацией (from={}, size={})", ownerId, from, size);
+            pageable = PageRequest.of(from / size, size);
+        } else {
+            log.info(
+                    "Получен запрос на получение списка бронирования вещей, принадлежащих владельцу с id={} " +
+                            "и статусом бронирования {}", ownerId, state);
+            pageable = Pageable.unpaged();
+        }
+        List<Booking> list = bookingService.getOwnerBookings(ownerId, bookingState, pageable);
         return BookingMapper.convertBookingToResponseList(list);
     }
 

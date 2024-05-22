@@ -50,7 +50,7 @@ public class ErrorHandler {
     public ValidationErrorResponse onManualValidationException(final ValidationException e) {
         List<Violation> violations = new ArrayList<>();
         violations.add(e.getViolation());
-        log.info("Exception (onManualValidationException): " + e.getMessage());
+        log.info("Exception (onManualValidationException): " + e.getViolation().getMessage());
         return new ValidationErrorResponse(violations);
     }
 
@@ -59,7 +59,7 @@ public class ErrorHandler {
     public ValidationErrorResponse onNotFoundException(final NotFoundException e) {
         List<Violation> violations = new ArrayList<>();
         violations.add(e.getViolation());
-        log.info("Exception (onNotFoundException): " + e.getMessage());
+        log.info("Exception (onNotFoundException): " + e.getViolation().getMessage());
         return new ValidationErrorResponse(violations);
     }
 
@@ -68,7 +68,7 @@ public class ErrorHandler {
     public ValidationErrorResponse onConflictException(final ConflictException e) {
         List<Violation> violations = new ArrayList<>();
         violations.add(e.getViolation());
-        log.info("Exception (onConflictException): " + e.getMessage());
+        log.info("Exception (onConflictException): " + e.getViolation().getMessage());
         return new ValidationErrorResponse(violations);
     }
 

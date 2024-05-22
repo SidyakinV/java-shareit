@@ -2,9 +2,10 @@ package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.booking.repository.JpaBookingRepository;
+import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.errorhandler.model.Violation;
 import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.exceptions.ValidationException;
@@ -12,10 +13,10 @@ import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.model.OwnerBookingInfo;
-import ru.practicum.shareit.item.repository.JpaCommentRepository;
-import ru.practicum.shareit.item.repository.JpaItemRepository;
+import ru.practicum.shareit.item.repository.CommentRepository;
+import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.repository.JpaUserRepository;
+import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -27,10 +28,10 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ItemServiceImpl implements ItemService {
 
-    private final JpaItemRepository itemRepository;
-    private final JpaUserRepository userRepository;
-    private final JpaBookingRepository bookingRepository;
-    private final JpaCommentRepository commentRepository;
+    private final ItemRepository itemRepository;
+    private final UserRepository userRepository;
+    private final BookingRepository bookingRepository;
+    private final CommentRepository commentRepository;
 
     @Override
     public Item addItem(ItemDto dto) {
@@ -72,8 +73,8 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemResponseDto> getOwnerItems(Long userId) {
-        List<Item> items = itemRepository.findByOwnerId(userId);
+    public List<ItemResponseDto> getOwnerItems(Long userId, Pageable pageable) {
+        List<Item> items = itemRepository.findByOwnerId(userId, pageable).getContent();
         log.info("Получен список вещей пользователя (count: {})", items.size());
 
         return items.stream()
@@ -83,13 +84,13 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemResponseDto> searchItems(String text) {
+    public List<ItemResponseDto> searchItems(String text, Pageable pageable) {
         if (text.isEmpty()) {
             log.info("Не определены критерии поиска вещи");
             return new ArrayList<>();
         }
 
-        List<Item> items = itemRepository.searchItems(text.toLowerCase());
+        List<Item> items = itemRepository.searchItems(text.toLowerCase(), pageable).getContent();
         log.info("Сформирован список вещей по фразе '{}'. Найдено совпадений: {}", text, items.size());
 
         return items.stream()

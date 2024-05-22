@@ -9,7 +9,7 @@ import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.exceptions.ValidationException;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.dto.UserMapper;
-import ru.practicum.shareit.user.repository.JpaUserRepository;
+import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.List;
 import java.util.regex.Pattern;
@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 @Slf4j
 public class UserServiceImpl implements UserService {
 
-    private final JpaUserRepository userRepository;
+    private final UserRepository userRepository;
 
     @Override
     public User addUser(User user) {

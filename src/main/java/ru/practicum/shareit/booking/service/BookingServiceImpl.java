@@ -2,19 +2,20 @@ package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingState;
-import ru.practicum.shareit.booking.repository.JpaBookingRepository;
+import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.errorhandler.model.Violation;
 import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.exceptions.ValidationException;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.item.repository.JpaItemRepository;
+import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.repository.JpaUserRepository;
+import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,9 +27,9 @@ import java.util.stream.Collectors;
 @Slf4j
 public class BookingServiceImpl implements BookingService {
 
-    private final JpaItemRepository itemRepository;
-    private final JpaUserRepository userRepository;
-    private final JpaBookingRepository bookingRepository;
+    private final ItemRepository itemRepository;
+    private final UserRepository userRepository;
+    private final BookingRepository bookingRepository;
 
     @Override
     public Booking addBooking(BookingDto dto) {
@@ -95,30 +96,30 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<Booking> getUserBookings(long userId, BookingState state) {
+    public List<Booking> getUserBookings(long userId, BookingState state, Pageable pageable) {
         getUserById(userId);
         switch (state) {
             case ALL:
-                return bookingRepository.getUserBookings(userId, null);
+                return bookingRepository.getUserBookings(userId, null, pageable).getContent();
             case WAITING:
             case REJECTED:
-                return bookingRepository.getUserBookings(userId, state);
+                return bookingRepository.getUserBookings(userId, state, pageable).getContent();
             default:
-                return filterBookings(bookingRepository.getUserBookings(userId, null), state);
+                return filterBookings(bookingRepository.getUserBookings(userId, null, pageable).getContent(), state);
         }
     }
 
     @Override
-    public List<Booking> getOwnerBookings(long ownerId, BookingState state) {
+    public List<Booking> getOwnerBookings(long ownerId, BookingState state, Pageable pageable) {
         getUserById(ownerId);
         switch (state) {
             case ALL:
-                return bookingRepository.getOwnerBookings(ownerId, null);
+                return bookingRepository.getOwnerBookings(ownerId, null, pageable).getContent();
             case WAITING:
             case REJECTED:
-                return bookingRepository.getOwnerBookings(ownerId, state);
+                return bookingRepository.getOwnerBookings(ownerId, state, pageable).getContent();
             default:
-                return filterBookings(bookingRepository.getOwnerBookings(ownerId, null), state);
+                return filterBookings(bookingRepository.getOwnerBookings(ownerId, null, pageable).getContent(), state);
         }
     }
 
