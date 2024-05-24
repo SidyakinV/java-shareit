@@ -45,21 +45,11 @@ public class BookingServiceImpl implements BookingService {
             throw new NotFoundException(
                     new Violation("Owner", "Вещь бронируется владельцем!"));
         }
-        /*
-        if (booking.getEnd().isBefore(booking.getStart()) || booking.getEnd().isBefore(LocalDateTime.now())) {
-            throw new ValidationException(
-                    new Violation("EndDate", "Некорректная дата завершения бронирования!"));
-        }
-        if (booking.getStart().isBefore(LocalDateTime.now()) || booking.getStart().isEqual(booking.getEnd())) {
-            throw new ValidationException(
-                    new Violation("StartDate", "Некорректная дата начала бронирования!"));
-        }
-        */
         if (booking.getStart().isBefore(LocalDateTime.now())) {
             throw new ValidationException(
                     new Violation("StartDate", "Некорректная дата начала бронирования!"));
         }
-        if (booking.getStart().isBefore(booking.getEnd())) {
+        if (!booking.getEnd().isAfter(booking.getStart())) {
             throw new ValidationException(
                     new Violation("EndDate", "Некорректная дата завершения бронирования!"));
         }

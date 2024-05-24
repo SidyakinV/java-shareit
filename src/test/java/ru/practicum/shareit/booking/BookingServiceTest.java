@@ -101,7 +101,7 @@ public class BookingServiceTest {
     @Test
     public void addBooking_success() {
         BookingDto dto = newBookingDto();
-        dto.setItemId(2L);
+        dto.setItemId(3L);
         Booking booking = bookingService.addBooking(dto);
 
         assertEquals(dto.getUserId(), booking.getUser().getId());
@@ -185,7 +185,7 @@ public class BookingServiceTest {
     }
 
     @Test
-    public void addBooking_fail_startAfterEnd() {
+    public void addBooking_fail_endBeforeStart() {
         BookingDto dto = newBookingDto();
         dto.setUserId(2L);
         LocalDateTime end = LocalDateTime.now().plusHours(1);
