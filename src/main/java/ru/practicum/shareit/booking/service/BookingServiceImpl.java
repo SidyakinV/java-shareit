@@ -45,6 +45,7 @@ public class BookingServiceImpl implements BookingService {
             throw new NotFoundException(
                     new Violation("Owner", "Вещь бронируется владельцем!"));
         }
+        /*
         if (booking.getEnd().isBefore(booking.getStart()) || booking.getEnd().isBefore(LocalDateTime.now())) {
             throw new ValidationException(
                     new Violation("EndDate", "Некорректная дата завершения бронирования!"));
@@ -52,6 +53,15 @@ public class BookingServiceImpl implements BookingService {
         if (booking.getStart().isBefore(LocalDateTime.now()) || booking.getStart().isEqual(booking.getEnd())) {
             throw new ValidationException(
                     new Violation("StartDate", "Некорректная дата начала бронирования!"));
+        }
+        */
+        if (booking.getStart().isBefore(LocalDateTime.now())) {
+            throw new ValidationException(
+                    new Violation("StartDate", "Некорректная дата начала бронирования!"));
+        }
+        if (booking.getStart().isBefore(booking.getEnd())) {
+            throw new ValidationException(
+                    new Violation("EndDate", "Некорректная дата завершения бронирования!"));
         }
 
         booking.setState(BookingState.WAITING);
@@ -74,7 +84,6 @@ public class BookingServiceImpl implements BookingService {
 
         if (approved) {
             booking.setState(BookingState.APPROVED);
-            // booking.getItem().setAvailable(false); // ?? не надо ??
         } else {
             booking.setState(BookingState.REJECTED);
         }
