@@ -95,7 +95,8 @@ public class BookingServiceTest {
         Mockito
                 .lenient()
                 .when(bookingRepository.save(Mockito.any(Booking.class)))
-                .thenAnswer(invocationOnMock -> invocationOnMock.getArguments()[0]);
+                .thenAnswer(invocationOnMock -> invocationOnMock.getArguments()[0]
+                );
     }
 
     @Test
