@@ -28,7 +28,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
-public class ItemServiceTest {
+public class ItemServiceUnitTest {
 
     @Mock
     private ItemRepository itemRepository;
@@ -48,7 +48,7 @@ public class ItemServiceTest {
     Map<Long, User> usersList = new HashMap<>();
     Map<Long, Item> itemsList = new HashMap<>();
 
-    public ItemServiceTest() {
+    public ItemServiceUnitTest() {
         usersList.put(1L, newUser(1L));
         usersList.put(2L, newUser(2L));
 

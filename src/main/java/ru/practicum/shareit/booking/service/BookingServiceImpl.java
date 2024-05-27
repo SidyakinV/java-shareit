@@ -102,6 +102,7 @@ public class BookingServiceImpl implements BookingService {
                 return bookingRepository.getUserBookings(userId, null, pageable).getContent();
             case WAITING:
             case REJECTED:
+            case APPROVED:
                 return bookingRepository.getUserBookings(userId, state, pageable).getContent();
             default:
                 return filterBookings(bookingRepository.getUserBookings(userId, null, pageable).getContent(), state);
@@ -116,6 +117,7 @@ public class BookingServiceImpl implements BookingService {
                 return bookingRepository.getOwnerBookings(ownerId, null, pageable).getContent();
             case WAITING:
             case REJECTED:
+            case APPROVED:
                 return bookingRepository.getOwnerBookings(ownerId, state, pageable).getContent();
             default:
                 return filterBookings(bookingRepository.getOwnerBookings(ownerId, null, pageable).getContent(), state);

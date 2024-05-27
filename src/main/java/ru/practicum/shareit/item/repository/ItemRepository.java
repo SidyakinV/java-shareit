@@ -12,8 +12,8 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
     @Query("SELECT it " +
             "FROM Item AS it " +
             "WHERE available = true " +
-            "  AND (LOWER(name) LIKE CONCAT('%', LOWER(:text), '%') " +
-            "       OR LOWER(description) LIKE CONCAT('%', LOWER(:text), '%')) ")
+            "  AND (LOWER(name) LIKE LOWER(CONCAT('%', :text, '%')) " +
+            "       OR LOWER(description) LIKE LOWER(CONCAT('%', :text, '%'))) ")
     Slice<Item> searchItems(String text, Pageable pageable);
 
     Slice<Item> findByOwnerId(Long userId, Pageable pageable);
