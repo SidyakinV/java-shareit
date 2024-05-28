@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.exceptions.ValidationException;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
@@ -73,6 +74,71 @@ public class UserServiceTests {
 
         assertEquals(user.getName(), savedUser.getName());
         assertEquals(user.getEmail(), savedUser.getEmail());
+    }
+
+    @Test
+    public void updateUser_fail_blankName() {
+        User user = newUser("user1@mail.ru");
+        em.persist(user);
+
+        user.setName(" ");
+
+        final Exception exception = assertThrows(
+                ValidationException.class,
+                () -> userService.updateUser(user));
+        assertNotNull(exception);
+    }
+
+    @Test
+    public void updateUser_fail_blankEmail() {
+        User user = newUser("user1@mail.ru");
+        em.persist(user);
+
+        user.setEmail(" ");
+
+        final Exception exception = assertThrows(
+                ValidationException.class,
+                () -> userService.updateUser(user));
+        assertNotNull(exception);
+    }
+
+    @Test
+    public void updateUser_fail_badEmail() {
+        User user = newUser("user1@mail.ru");
+        em.persist(user);
+
+        user.setEmail("vasya.pupkin");
+
+        final Exception exception = assertThrows(
+                ValidationException.class,
+                () -> userService.updateUser(user));
+        assertNotNull(exception);
+    }
+
+    @Test
+    public void getUser_success() {
+        User user = newUser("user1@mail.ru");
+        em.persist(user);
+
+        User savedUser = userService.getUser(user.getId());
+
+        assertEquals(user.getName(), savedUser.getName());
+        assertEquals(user.getEmail(), savedUser.getEmail());
+    }
+
+    @Test
+    public void deleteUser_success() {
+        User user = newUser("user1@mail.ru");
+        em.persist(user);
+
+        userService.deleteUser(user.getId());
+
+        TypedQuery<User> query = em
+                .createQuery("SELECT u FROM User u WHERE u.id = :id", User.class)
+                .setParameter("id", user.getId());
+        List<User> users = query.getResultList();
+
+        assertEquals(0, users.size());
     }
 
     @Test
