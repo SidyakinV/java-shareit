@@ -10,6 +10,6 @@ import java.util.List;
 public class RequestWithAnswerDto {
     private Long id;
     private String description;
-    private LocalDateTime created;
+    private String created;
     private List<ItemResponseDto> items;
 }

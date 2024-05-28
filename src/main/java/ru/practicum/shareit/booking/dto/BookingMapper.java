@@ -19,8 +19,8 @@ public class BookingMapper {
     public static BookingResponseDto mapBookingToResponse(Booking booking) {
         BookingResponseDto dto = new BookingResponseDto();
         dto.setId(booking.getId());
-        dto.setStart(booking.getStart());
-        dto.setEnd(booking.getEnd());
+        dto.setStart(booking.getStart().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        dto.setEnd(booking.getEnd().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
         dto.setStatus(booking.getState().toString());
 
         BookingUser user = new BookingUser();

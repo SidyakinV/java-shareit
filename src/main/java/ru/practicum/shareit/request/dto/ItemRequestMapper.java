@@ -3,6 +3,7 @@ package ru.practicum.shareit.request.dto;
 import ru.practicum.shareit.item.dto.ItemResponseDto;
 import ru.practicum.shareit.request.model.ItemRequest;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class ItemRequestMapper {
@@ -11,7 +12,7 @@ public class ItemRequestMapper {
         ItemRequestResponseDto dto = new ItemRequestResponseDto();
         dto.setId(itemRequest.getId());
         dto.setDescription(itemRequest.getDescription());
-        dto.setCreated(itemRequest.getCreated());
+        dto.setCreated(itemRequest.getCreated().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
         return dto;
     }
 
@@ -25,7 +26,7 @@ public class ItemRequestMapper {
         RequestWithAnswerDto dto = new RequestWithAnswerDto();
         dto.setId(itemRequest.getId());
         dto.setDescription(itemRequest.getDescription());
-        dto.setCreated(itemRequest.getCreated());
+        dto.setCreated(itemRequest.getCreated().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
         dto.setItems(items);
         return dto;
     }
