@@ -76,7 +76,7 @@ public class ItemServiceUnitTests {
                 });
         Mockito
                 .lenient()
-                .when(bookingRepository.getFinishedUserBooking(Mockito.anyLong(), Mockito.anyLong()))
+                .when(bookingRepository.getLastFinishedUserBooking(Mockito.anyLong(), Mockito.anyLong()))
                 .thenAnswer(invocationOnMock -> {
                     Long userId = invocationOnMock.getArgument(0, Long.class);
                     return userId == 1 ? new Booking() : null;

@@ -104,7 +104,7 @@ public class ItemServiceImpl implements ItemService {
         comment.setItem(getItemById(dto.getItemId()));
         comment.setAuthor(getUserById(dto.getUserId()));
 
-        if (bookingRepository.getFinishedUserBooking(dto.getUserId(), dto.getItemId()) == null) {
+        if (bookingRepository.getLastFinishedUserBooking(dto.getUserId(), dto.getItemId()) == null) {
             throw new ValidationException(
                     new Violation("error",
                             "Комментарии могут оставлять только те пользователь, которые брали вещь в аренду"));

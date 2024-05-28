@@ -34,10 +34,10 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
                     "  AND b.user_id = :userId " +
                     "  AND b.end_time < now() " +
                     "  AND b.state = 'APPROVED' " +
-                    "ORDER BY b.id DESC " +
+                    "ORDER BY b.end_time DESC " +
                     "LIMIT 1",
             nativeQuery = true)
-    Booking getFinishedUserBooking(Long userId, Long itemId);
+    Booking getLastFinishedUserBooking(Long userId, Long itemId);
 
     @Query(value =
             "SELECT b.* " +
@@ -47,7 +47,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
                     "  AND i.owner_id = :ownerId " +
                     "  AND b.start_time <= now() " +
                     "  AND b.state = 'APPROVED' " +
-                    "ORDER BY b.id DESC " +
+                    "ORDER BY b.start_time DESC " +
                     "LIMIT 1",
             nativeQuery = true)
     Booking getLastBooking(Long itemId, Long ownerId);

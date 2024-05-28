@@ -11,6 +11,8 @@ import ru.practicum.shareit.booking.dto.BookingResponseDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.booking.service.BookingService;
+import ru.practicum.shareit.errorhandler.model.Violation;
+import ru.practicum.shareit.exceptions.ValidationException;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -68,6 +70,9 @@ public class BookingController {
     ) {
         Pageable pageable;
         BookingState bookingState = BookingState.stringToBookingState(state);
+        if (from != null && from < 0) {
+            throw new ValidationException(new Violation("from", "Некорректное значение"));
+        }
         if (from != null && bookingState == BookingState.ALL) {
             log.info(
                     "Получен запрос на получение списка бронирования вещей пользователем с id={} " +
@@ -92,6 +97,9 @@ public class BookingController {
     ) {
         Pageable pageable;
         BookingState bookingState = BookingState.stringToBookingState(state);
+        if (from != null && from < 0) {
+            throw new ValidationException(new Violation("from", "Некорректное значение"));
+        }
         if (from != null && bookingState == BookingState.ALL) {
             log.info(
                     "Получен запрос на получение списка бронирования вещей, принадлежащих владельцу с id={} " +
