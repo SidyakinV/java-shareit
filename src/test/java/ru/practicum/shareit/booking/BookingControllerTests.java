@@ -181,13 +181,6 @@ public class BookingControllerTests {
         return dto;
     }
 
-    private List<BookingResponseDto> getBookingResponseDtoList() {
-        List<BookingResponseDto> list = new ArrayList<>();
-        list.add(newBookingResponseDto(1L));
-        list.add(newBookingResponseDto(2L));
-        return list;
-    }
-
     private List<Booking> getBookingList() {
         BookingDto dto = newBookingDto();
         Booking booking = newBooking(dto, 1L);
