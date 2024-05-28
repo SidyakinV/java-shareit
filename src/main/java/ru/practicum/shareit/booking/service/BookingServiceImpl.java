@@ -145,7 +145,7 @@ public class BookingServiceImpl implements BookingService {
     private BookingState getBookingPeriodState(Booking booking) {
         if (booking.getEnd().isBefore(LocalDateTime.now())) {
             return BookingState.PAST;
-        } else if (booking.getStart().isAfter(LocalDateTime.now())) {
+        } else if (!booking.getStart().isBefore(LocalDateTime.now())) {
             return BookingState.FUTURE;
         } else {
             return BookingState.CURRENT;
