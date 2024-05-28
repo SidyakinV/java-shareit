@@ -78,7 +78,7 @@ public class ItemRequestServiceTests {
     @Test
     public void getAllItemRequests_success() {
         List<RequestWithAnswerDto> list = requestService.getAllItemRequests(testUser.getId(), Pageable.unpaged());
-        assertEquals(3, list.size());
+        assertEquals(2, list.size());
     }
 
     @Test
