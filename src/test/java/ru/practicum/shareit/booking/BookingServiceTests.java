@@ -10,6 +10,7 @@ import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.booking.service.BookingService;
+import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
@@ -21,7 +22,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Transactional
 @SpringBootTest(
@@ -57,6 +58,108 @@ public class BookingServiceTests {
         assertEquals(booking.getState(), BookingState.WAITING);
         assertEquals(booking.getStart().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), dto.getStart());
         assertEquals(booking.getEnd().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), dto.getEnd());
+    }
+
+    @Test
+    public void approveBooking_setApproved_success() {
+        User user = newUser("mail@email.com");
+        em.persist(user);
+
+        Item item = newItem(user);
+        em.persist(item);
+
+        Booking booking = newBooking(user, item, LocalDateTime.now().plusHours(1), BookingState.WAITING);
+        em.persist(booking);
+
+        bookingService.approveBooking(user.getId(), booking.getId(), true);
+
+        TypedQuery<Booking> query = em
+                .createQuery("SELECT b FROM Booking b WHERE b.id = :id", Booking.class)
+                .setParameter("id", booking.getId());
+        Booking savedBooking = query.getSingleResult();
+
+        assertEquals(booking.getState(), BookingState.APPROVED);
+    }
+
+    @Test
+    public void approveBooking_setRejected_success() {
+        User user = newUser("mail@email.com");
+        em.persist(user);
+
+        Item item = newItem(user);
+        em.persist(item);
+
+        Booking booking = newBooking(user, item, LocalDateTime.now().plusHours(1), BookingState.WAITING);
+        em.persist(booking);
+
+        bookingService.approveBooking(user.getId(), booking.getId(), false);
+
+        TypedQuery<Booking> query = em
+                .createQuery("SELECT b FROM Booking b WHERE b.id = :id", Booking.class)
+                .setParameter("id", booking.getId());
+        Booking savedBooking = query.getSingleResult();
+
+        assertEquals(booking.getState(), BookingState.REJECTED);
+    }
+
+    @Test
+    public void getBookingInfo_itemOwner_success() {
+        User user = newUser("user@email.com");
+        em.persist(user);
+
+        User owner = newUser("owner@email.com");
+        em.persist(owner);
+
+        Item item = newItem(owner);
+        em.persist(item);
+
+        Booking booking = newBooking(user, item, LocalDateTime.now().plusHours(1), BookingState.WAITING);
+        em.persist(booking);
+
+        Booking savedBooking = bookingService.getBookingInfo(owner.getId(), booking.getId());
+        assertNotNull(savedBooking);
+    }
+
+    @Test
+    public void getBookingInfo_userBooking_success() {
+        User user = newUser("user@email.com");
+        em.persist(user);
+
+        User owner = newUser("owner@email.com");
+        em.persist(owner);
+
+        Item item = newItem(owner);
+        em.persist(item);
+
+        Booking booking = newBooking(user, item, LocalDateTime.now().plusHours(1), BookingState.WAITING);
+        em.persist(booking);
+
+        Booking savedBooking = bookingService.getBookingInfo(user.getId(), booking.getId());
+        assertNotNull(savedBooking);
+    }
+
+    @Test
+    public void getBookingInfo_otherUser_fail() {
+        User user = newUser("user@email.com");
+        em.persist(user);
+
+        User owner = newUser("owner@email.com");
+        em.persist(owner);
+
+        User otherUser = newUser("otheruser@email.com");
+        em.persist(otherUser);
+
+        Item item = newItem(owner);
+        em.persist(item);
+
+        Booking booking = newBooking(user, item, LocalDateTime.now().plusHours(1), BookingState.WAITING);
+        em.persist(booking);
+
+        final Exception exception = assertThrows(
+                NotFoundException.class,
+                () -> bookingService.getBookingInfo(otherUser.getId(), booking.getId())
+        );
+        assertNotNull(exception);
     }
 
     @Test
@@ -176,6 +279,15 @@ public class BookingServiceTests {
         user.setName("Пользователь 1");
         user.setEmail(email);
         return user;
+    }
+
+    private Item newItem(User owner) {
+        Item item = new Item();
+        item.setOwner(owner);
+        item.setName("Вещь");
+        item.setDescription("Описание");
+        item.setAvailable(true);
+        return item;
     }
 
     private ItemDto newItemDto(Long ownerId) {
