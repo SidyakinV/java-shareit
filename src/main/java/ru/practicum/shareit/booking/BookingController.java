@@ -2,8 +2,6 @@ package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingMapper;
@@ -11,8 +9,7 @@ import ru.practicum.shareit.booking.dto.BookingResponseDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.booking.service.BookingService;
-import ru.practicum.shareit.errorhandler.model.Violation;
-import ru.practicum.shareit.exceptions.ValidationException;
+import ru.practicum.shareit.utility.PageCalc;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -68,23 +65,12 @@ public class BookingController {
             @RequestParam(required = false) Integer from,
             @RequestParam(defaultValue = "20") Integer size
     ) {
-        Pageable pageable;
-        BookingState bookingState = BookingState.stringToBookingState(state);
-        if (from != null && from < 0) {
-            throw new ValidationException(new Violation("from", "Некорректное значение"));
-        }
-        if (from != null && bookingState == BookingState.ALL) {
-            log.info(
-                    "Получен запрос на получение списка бронирования вещей пользователем с id={} " +
-                            "и пагинацией (from={}, size={})", userId, from, size);
-            pageable = PageRequest.of(from / size, size);
-        } else {
-            log.info(
-                    "Получен запрос на получение списка бронирования вещей пользователем с id={} " +
-                            "и статусом бронирования {}", userId, state);
-            pageable = Pageable.unpaged();
-        }
-        List<Booking> list = bookingService.getUserBookings(userId, bookingState, pageable);
+        log.info(
+                "Получен запрос на получение списка бронирования вещей пользователем с id={}, " +
+                "параметры пагинации: from={}, size={}",
+                userId, from, size);
+        List<Booking> list = bookingService.getUserBookings(userId,
+                BookingState.stringToBookingState(state), PageCalc.getPageable(from, size));
         return BookingMapper.convertBookingToResponseList(list);
     }
 
@@ -95,23 +81,12 @@ public class BookingController {
             @RequestParam(required = false) Integer from,
             @RequestParam(defaultValue = "20") Integer size
     ) {
-        Pageable pageable;
-        BookingState bookingState = BookingState.stringToBookingState(state);
-        if (from != null && from < 0) {
-            throw new ValidationException(new Violation("from", "Некорректное значение"));
-        }
-        if (from != null && bookingState == BookingState.ALL) {
-            log.info(
-                    "Получен запрос на получение списка бронирования вещей, принадлежащих владельцу с id={} " +
-                            "и пагинацией (from={}, size={})", ownerId, from, size);
-            pageable = PageRequest.of(from / size, size);
-        } else {
-            log.info(
-                    "Получен запрос на получение списка бронирования вещей, принадлежащих владельцу с id={} " +
-                            "и статусом бронирования {}", ownerId, state);
-            pageable = Pageable.unpaged();
-        }
-        List<Booking> list = bookingService.getOwnerBookings(ownerId, bookingState, pageable);
+        log.info(
+                "Получен запрос на получение списка бронирования вещей, принадлежащих владельцу с id={}, " +
+                "параметры пагинации: from={}, size={}",
+                ownerId, from, size);
+        List<Booking> list = bookingService.getOwnerBookings(ownerId,
+                BookingState.stringToBookingState(state), PageCalc.getPageable(from, size));
         return BookingMapper.convertBookingToResponseList(list);
     }
 

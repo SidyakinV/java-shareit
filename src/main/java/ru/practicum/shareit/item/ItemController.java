@@ -2,13 +2,12 @@ package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
+import ru.practicum.shareit.utility.PageCalc;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -55,17 +54,11 @@ public class ItemController {
             @RequestParam(required = false) Integer from,
             @RequestParam(defaultValue = "20") Integer size
     ) {
-        Pageable pageable;
-        if (from != null) {
-            log.info(
-                    "Получен GET-запрос от пользователя с id={} на получение списка его вещей с пагинацией (from={}, size={})",
-                    userId, from, size);
-            pageable = PageRequest.of(from / size, size);
-        } else {
-            log.info("Получен GET-запрос от пользователя с id={} на получение списка его вещей", userId);
-            pageable = Pageable.unpaged();
-        }
-        return itemService.getOwnerItems(userId, pageable);
+        log.info(
+                "Получен GET-запрос от пользователя с id={} на получение списка его вещей, " +
+                "параметры пагинации (from={}, size={})",
+                userId, from, size);
+        return itemService.getOwnerItems(userId, PageCalc.getPageable(from, size));
     }
 
     @GetMapping("/search")
@@ -75,16 +68,9 @@ public class ItemController {
             @RequestParam(required = false) Integer from,
             @RequestParam(defaultValue = "20") Integer size
     ) {
-        Pageable pageable;
-        if (from != null) {
-            log.info("Получен GET-запрос от пользователя с id={} на поиск вещей по ключевому слову '{}' " +
-                    "с пагинацией (from={}, size={})", userId, text, from, size);
-            pageable = PageRequest.of(from / size, size);
-        } else {
-            log.info("Получен GET-запрос от пользователя с id={} на поиск вещей по ключевому слову '{}'", userId, text);
-            pageable = Pageable.unpaged();
-        }
-        return itemService.searchItems(text, pageable);
+        log.info("Получен GET-запрос от пользователя с id={} на поиск вещей по ключевому слову '{}', " +
+                "параметры пагинации: from={}, size={}", userId, text, from, size);
+        return itemService.searchItems(text, PageCalc.getPageable(from, size));
     }
 
     @PostMapping("/{itemId}/comment")

@@ -33,7 +33,8 @@ public class BookingJsonTests {
         dto.setEnd(end.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
         dto.setUserId(2L);
 
-        String expected = String.format("{\"itemId\":%d,\"start\":\"%s\",\"end\":\"%s\",\"userId\":%d}",
+        String expected = String.format(
+                "{\"itemId\":%d,\"start\":\"%s\",\"end\":\"%s\",\"userId\":%d}",
                 dto.getItemId(), dto.getStart(), dto.getEnd(), dto.getUserId());
 
         assertEquals(expected, mapper.writeValueAsString(dto));
@@ -60,7 +61,7 @@ public class BookingJsonTests {
 
         String expected = String.format(
                 "{\"id\":%d,\"start\":\"%s\",\"end\":\"%s\",\"status\":\"%s\",\"booker\":" +
-                        "{\"id\":%d},\"item\":{\"id\":%d,\"name\":\"%s\"}}",
+                "{\"id\":%d},\"item\":{\"id\":%d,\"name\":\"%s\"}}",
                 dto.getId(), dto.getStart(), dto.getEnd(), dto.getStatus(),
                 dto.getBooker().getId(), dto.getItem().getId(), dto.getItem().getName());
 
