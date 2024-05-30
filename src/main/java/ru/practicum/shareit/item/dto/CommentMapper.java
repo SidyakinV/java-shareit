@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.dto;
 
 import ru.practicum.shareit.item.model.Comment;
 
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +18,7 @@ public class CommentMapper {
         CommentResponseDto dto = new CommentResponseDto();
         dto.setId(comment.getId());
         dto.setText(comment.getText());
-        dto.setCreated(comment.getCreated());
+        dto.setCreated(comment.getCreated().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
         dto.setAuthorName(comment.getAuthor().getName());
         return dto;
     }
@@ -30,7 +31,7 @@ public class CommentMapper {
                 commentDto.setId(comment.getId());
                 commentDto.setText(comment.getText());
                 commentDto.setAuthorName(comment.getAuthor().getName());
-                commentDto.setCreated(comment.getCreated());
+                commentDto.setCreated(comment.getCreated().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
                 listDto.add(commentDto);
             }
         }

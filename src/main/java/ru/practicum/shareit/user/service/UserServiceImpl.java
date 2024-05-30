@@ -4,12 +4,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.errorhandler.model.Violation;
-import ru.practicum.shareit.exceptions.ConflictException;
 import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.exceptions.ValidationException;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.dto.UserMapper;
-import ru.practicum.shareit.user.repository.JpaUserRepository;
+import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.List;
 import java.util.regex.Pattern;
@@ -19,7 +18,7 @@ import java.util.regex.Pattern;
 @Slf4j
 public class UserServiceImpl implements UserService {
 
-    private final JpaUserRepository userRepository;
+    private final UserRepository userRepository;
 
     @Override
     public User addUser(User user) {
@@ -66,23 +65,6 @@ public class UserServiceImpl implements UserService {
         return userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException(
                         new Violation("user", String.format("Пользователь с id=%d не найден!", userId))));
-    }
-
-    private void checkEmailExists(String email) {
-        if (userRepository.findByEmailIgnoreCase(email).size() > 0) {
-            throw new ConflictException(
-                    new Violation("email", "Пользователь с указанным email уже существует!"));
-        }
-    }
-
-    private void checkEmailExists(String email, Long userId) {
-        List<User> users = userRepository.findByEmailIgnoreCase(email);
-        for (User user : users) {
-            if (!user.getId().equals(userId)) {
-                throw new ConflictException(
-                        new Violation("email", "Пользователь с указанным email уже существует!"));
-            }
-        }
     }
 
     private void checkNotBlankField(String value, String name) {

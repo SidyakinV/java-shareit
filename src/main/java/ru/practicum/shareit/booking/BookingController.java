@@ -9,6 +9,7 @@ import ru.practicum.shareit.booking.dto.BookingResponseDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.booking.service.BookingService;
+import ru.practicum.shareit.utility.PageCalc;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -24,7 +25,8 @@ public class BookingController {
     @PostMapping
     public BookingResponseDto addBooking(
             @RequestHeader("X-Sharer-User-Id") Long userId,
-            @Valid @RequestBody BookingDto dto) {
+            @Valid @RequestBody BookingDto dto
+    ) {
         log.info("Получен запрос на бронирование от пользователя с id={}: {}", userId, dto);
         dto.setUserId(userId);
         Booking booking = bookingService.addBooking(dto);
@@ -35,7 +37,8 @@ public class BookingController {
     public BookingResponseDto approveBooking(
             @RequestHeader("X-Sharer-User-Id") Long userId,
             @PathVariable Long bookingId,
-            @RequestParam Boolean approved) {
+            @RequestParam Boolean approved
+    ) {
         log.info(
                 "Получен запрос на подтверждение бронирования (bookingId={}) от пользователя userId={}, " +
                         "статус {}", bookingId, userId, approved);
@@ -46,7 +49,8 @@ public class BookingController {
     @GetMapping("/{bookingId}")
     public BookingResponseDto getBookingInfo(
             @RequestHeader("X-Sharer-User-Id") Long userId,
-            @PathVariable Long bookingId) {
+            @PathVariable Long bookingId
+    ) {
         log.info(
                 "Получен запрос на получение информации о бронировании (bookingId={}) от пользователя userId={}",
                 bookingId, userId);
@@ -57,22 +61,32 @@ public class BookingController {
     @GetMapping
     public List<BookingResponseDto> getUserBookings(
             @RequestHeader("X-Sharer-User-Id") Long userId,
-            @RequestParam(defaultValue = "ALL") String state) {
+            @RequestParam(defaultValue = "ALL") String state,
+            @RequestParam(required = false) Integer from,
+            @RequestParam(defaultValue = "20") Integer size
+    ) {
         log.info(
-                "Получен запрос на получение списка бронирования вещей пользователем с id={} " +
-                        "и статусом бронирования {}", userId, state);
-        List<Booking> list = bookingService.getUserBookings(userId, BookingState.stringToBookingState(state));
+                "Получен запрос на получение списка бронирования вещей пользователем с id={}, " +
+                "параметры пагинации: from={}, size={}",
+                userId, from, size);
+        List<Booking> list = bookingService.getUserBookings(userId,
+                BookingState.stringToBookingState(state), PageCalc.getPageable(from, size));
         return BookingMapper.convertBookingToResponseList(list);
     }
 
     @GetMapping("/owner")
     public List<BookingResponseDto> getOwnerBookings(
             @RequestHeader("X-Sharer-User-Id") Long ownerId,
-            @RequestParam(defaultValue = "ALL") String state) {
+            @RequestParam(defaultValue = "ALL") String state,
+            @RequestParam(required = false) Integer from,
+            @RequestParam(defaultValue = "20") Integer size
+    ) {
         log.info(
-                "Получен запрос на получение списка бронирования вещей, принадлежащих владельцу с id={} " +
-                        "и статусом бронирования {}", ownerId, state);
-        List<Booking> list = bookingService.getOwnerBookings(ownerId, BookingState.stringToBookingState(state));
+                "Получен запрос на получение списка бронирования вещей, принадлежащих владельцу с id={}, " +
+                "параметры пагинации: from={}, size={}",
+                ownerId, from, size);
+        List<Booking> list = bookingService.getOwnerBookings(ownerId,
+                BookingState.stringToBookingState(state), PageCalc.getPageable(from, size));
         return BookingMapper.convertBookingToResponseList(list);
     }
 
