@@ -63,7 +63,7 @@ public class ItemController {
     @GetMapping("/search")
     public List<ItemResponseDto> searchItems(
             @RequestHeader("X-Sharer-User-Id") Long userId,
-            @RequestParam String text,
+            @RequestParam(required = false) String text,
             @RequestParam(required = false) Integer from,
             @RequestParam(defaultValue = "20") Integer size
     ) {

@@ -16,7 +16,7 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
             "       OR LOWER(description) LIKE LOWER(CONCAT('%', :text, '%'))) ")
     Slice<Item> searchItems(String text, Pageable pageable);
 
-    Slice<Item> findByOwnerId(Long userId, Pageable pageable);
+    Slice<Item> findByOwnerIdOrderById(Long userId, Pageable pageable);
 
     List<Item> findByRequestId(Long requestId);
 }

@@ -74,7 +74,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemResponseDto> getOwnerItems(Long userId, Pageable pageable) {
-        List<Item> items = itemRepository.findByOwnerId(userId, pageable).getContent();
+        List<Item> items = itemRepository.findByOwnerIdOrderById(userId, pageable).getContent();
         log.info("Получен список вещей пользователя (count: {})", items.size());
 
         return items.stream()
