@@ -79,4 +79,11 @@ public class ErrorHandler {
         return Map.of("error", e.getMessage());
     }
 
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public Map<String, String> onRuntimeException(final RuntimeException e) {
+        log.error(e.getMessage());
+        return Map.of("error", e.getMessage());
+    }
+
 }
